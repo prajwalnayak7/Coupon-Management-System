@@ -2,33 +2,98 @@ package data
 
 import (
 	"database/sql"
-	// "fmt"
+	"log"
+	"net/http"
+	"math/rand"
+	"time"
+	"strings"
+	"strconv"
 )
 
-var DB *sql.DB
 
-
-func GenerateCouponCode() string {
-	return "GenerateCouponCode"
+func checkError(err error) {
+	if err != nil {
+        log.Fatal(err)
+    }
 }
 
-func GetCouponDetails() string {
-	rows, err := DB.Query("SELECT COUNT(*) FROM coupon")
-	if err != nil { /* error handling */}
-	items := make([]*SomeStruct, 0, 10)
-	var ida, idb uint
-	for rows.Next() {
-		err = rows.Scan(&ida, &idb)
-		if err != nil { /* error handling */}
-		items = append(items, &SomeStruct{ida, idb})
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+
+func randSeq(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
+}
+
+func GenerateCouponCode(r *http.Request) string {
+	user:="root"
+	password:="pass@123"
+	database:="cms"
+	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
+	checkError(err)
+	defer con.Close()
+
+	r.PostFormValue("") 
+	if err := r.ParseForm(); err != nil {
+		// handle error
 	}
+	data := make(map[string]string)
+	for key, values := range r.PostForm {
+		data[key] = strings.Join(values," ")
+	}
+	log.Println("POST params were:", data)
+	rand.Seed(time.Now().UnixNano())
+	var i int
+	if length, present := data["code_length"]; present {
+		if present {
+			i, _ = strconv.Atoi(length)
+			// checkError(err)
+		} else {
+			i = 10
+		}
+	}
+	coupon_code := randSeq(i)
+	log.Println("Generated a Coupon Code:",coupon_code)
 
-	return "bam"
+	rows, err := con.Query("INSERT INTO `coupon` (code, expiry_date, availability_count, product_id, promo_type, discount_fixed, discount_variable) VALUES (?, ?, ?, ?, ?, ?, ?)", coupon_code, data["expiry_date"], data["availability_count"], data["product_id"], data["promo_type"], data["discount_fixed"], data["discount_variable"])
+	checkError(err)
+	log.Println(rows)
+	return coupon_code
 }
 
-// func UpdateCouponDetails(){
-// 	return "nothing"
-// }
+func GetCouponDetails(r *http.Request) map[string]string {
+	user:="root"
+	password:="pass@123"
+	database:="cms"
+	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
+	checkError(err)
+	defer con.Close()
+
+	log.Println("GET params were:", r.URL.Query())
+	code := r.URL.Query().Get("code")
+	rows, err := con.Query("SELECT * FROM `coupon` WHERE code=?", code)
+	cols, _ := rows.Columns()
+	
+	data := make(map[string]string)
+	if rows.Next() {
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i, _ := range columns {
+			columnPointers[i] = &columns[i]
+		}
+		rows.Scan(columnPointers...)
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+	}
+	return data
+}
+
+func UpdateCouponDetails(r *http.Request) string {
+	return "Successfully Updated"
+}
 
 // func ValidateCoupon(){
 // 	return "nothing"

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type coupon struct {
+type Coupon struct {
 	id 					int64 `json:"id"`
 	code 				string `json:"code"`
 	expiryDate 			time.Time `json:"expiry_date"`
@@ -18,7 +18,7 @@ type coupon struct {
 	updatedAt 			time.Time `json:"updated_at"`
 }
 
-type order struct {
+type Order struct {
 	id 			int64 `json:"id"`
 	couponId 	int64 `json:"coupon_id"`
 	clientId 	string `json:"client_id"`

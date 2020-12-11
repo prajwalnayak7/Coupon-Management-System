@@ -10,7 +10,7 @@ import (
 	"os/signal"
 	"sync/atomic"
 	"time"
-
+	"encoding/json"
 	"database/sql"
     _ "github.com/go-sql-driver/mysql"
 
@@ -50,7 +50,7 @@ func main() {
 	logger.Println("Database", database,"connected successfully as user", user)
 
 	router := http.NewServeMux()
-	router.Handle("/", index())
+	router.Handle("/coupon/", coupon())
 	router.Handle("/healthz", healthz())
 
 	nextRequestID := func() string {
@@ -73,9 +73,7 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 
 	go func() {
-		logger.Println("Server is QWE")
 		<-quit
-		logger.Println("Server is 123")
 		logger.Println("Server is shutting down...")
 		atomic.StoreInt32(&healthy, 0)
 
@@ -99,17 +97,28 @@ func main() {
 	logger.Println("Server stopped")
 }
 
-func index() http.Handler {
+func coupon() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
+		if r.URL.Path != "/coupon/" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, "I'm alive")
-		fmt.Fprintln(w, data.GetCouponDetails())
+		switch r.Method {
+			case "GET":     
+				w.WriteHeader(http.StatusOK)
+				jsonData, _ := json.Marshal(data.GetCouponDetails(r))
+				fmt.Fprintln(w, string(jsonData))
+			case "POST":
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintln(w, data.GenerateCouponCode(r))
+			case "PUT":
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintln(w, data.UpdateCouponDetails(r))
+			default:
+				fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
+		}
 	})
 }
 

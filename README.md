@@ -75,11 +75,13 @@ The Schema / Model design :
 
 
 ___
-### Demo
+### CI/CD
 TODO
 ### Testing
 TODO
-### CI/CD
+### Profiling
+TODO
+### Demo
 TODO
 ___
 ## Engineering Commands
