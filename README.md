@@ -32,8 +32,8 @@ ___
 ### Persistence Layer
 
 The Schema / Model design :
-
-<iframe width="560" height="315" src='https://dbdiagram.io/embed/5fd2e1e79a6c525a03baa5fa'> </iframe>
+![Schema Design](./res/SchemaDesign.png)
+<!-- <iframe width="560" height="315" src='https://dbdiagram.io/embed/5fd2e1e79a6c525a03baa5fa'> </iframe> -->
 
 ### Application Layer
 
@@ -41,7 +41,7 @@ The Schema / Model design :
 
 ### Interface Layer
 1. Generate a Coupon Code
-   ```
+   ```sh
    curl --location -g --request POST '{{ BASE_URL }}/coupon/' \
     --header 'Authorization: <Token>' \
     --form 'code_length="6"' \
@@ -52,23 +52,23 @@ The Schema / Model design :
     --form 'discount_fixed="20"'
     ```
 2. Get all the details of the Coupon
-    ```
+    ```sh
     curl --location -g --request GET '{{ BASE_URL }}/coupon/?code=AYSB23X2' \
     --header 'Authorization: <Token>'
     ```
 3. Update / Delete Coupon attributes
-    ```
+    ```sh
     curl --location -g --request PUT '{{ BASE_URL }}/coupon/AYSB23X2/' \
     --header 'Authorization: <Token>' \
     --form 'availability_count="0"'
     ```
 4. Validate a Code
-    ```
+    ```sh
     curl --location -g --request GET '{{ BASE_URL }}/coupon/consume/?code=AYSB23X2&product_id=apple123' \
     --header 'Authorization: <Token>'
     ```
 5. Consume a Code
-    ```
+    ```sh
     curl --location -g --request POST '{{ BASE_URL }}/coupon/consume/?code=AYSB23X2' \
     --header 'Authorization: <Token>'
     ```
@@ -78,6 +78,8 @@ ___
 ### Demo
 TODO
 ### Testing
+TODO
+### CI/CD
 TODO
 ___
 ### Note:
