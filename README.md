@@ -82,7 +82,7 @@ TODO
 ### CI/CD
 TODO
 ___
-## Engineering
+## Engineering Commands
 
 Module Management Commands:
 
@@ -91,12 +91,24 @@ Module Management Commands:
 go mod init github.com/prajwalnayak7/Coupon-Management-System
 ```
 ```
-// Automatically add project dependencies
-go build
+// Build the project and automatically add dependencies
+go build -o build
 // Clean unwanted dependencies
 go mod tidy
 // Download all vendor dependencies into a project folder
 go mod vendor
+```
+
+```
+// Format the code
+go fmt
+```
+
+Setup database
+```
+sudo docker run --name mysql-8 -p 127.0.0.1:5000:3306 -e MYSQL_ROOT_PASSWORD=pass@123 -d mysql:8.0.19
+mysql -u root -p
+# Run the scripts /scripts/create_database.sql and /scripts/create_tables.sql
 ```
 
 ### Note:
