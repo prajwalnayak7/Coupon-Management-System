@@ -8,7 +8,7 @@ An open source system which manages coupon codes, they can be utilised for:
 - Growth hacks
 - Marketing campaigns, etc.
 
-## Use Cases
+### Use Cases
 
 - Run a marketing trail by offering cashbacks via unique coupon codes with your products.
 - A limited period offer during the festival seasons.
@@ -16,7 +16,7 @@ An open source system which manages coupon codes, they can be utilised for:
 - Bundling the products.
 - Cashback rewards.
 
-## Features / Requirements
+### Features / Requirements
 
 1. Randomly generate a code of customizable length, count and validity.
 2. Validate a coupon code and rate limit the API's to prevent misuse.
@@ -82,6 +82,23 @@ TODO
 ### CI/CD
 TODO
 ___
+## Engineering
+
+Module Management Commands:
+
+```sh
+// Start a go based application with modules independent of $GOPATH
+go mod init github.com/prajwalnayak7/Coupon-Management-System
+```
+```
+// Automatically add project dependencies
+go build
+// Clean unwanted dependencies
+go mod tidy
+// Download all vendor dependencies into a project folder
+go mod vendor
+```
+
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
 > * The idea was to start small and simple, explore tools and techniques on the way and evolve consistently.
