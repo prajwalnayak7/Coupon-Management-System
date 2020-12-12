@@ -47,12 +47,9 @@ func GenerateCouponCode(r *http.Request) string {
 	rand.Seed(time.Now().UnixNano())
 	var i int
 	if length, present := data["code_length"]; present {
-		if present {
-			i, _ = strconv.Atoi(length)
-			// checkError(err)
-		} else {
-			i = 10
-		}
+		i, _ = strconv.Atoi(length)
+	} else {
+		i = 10
 	}
 	coupon_code := randSeq(i)
 	log.Println("Generated a Coupon Code:",coupon_code)
@@ -95,10 +92,55 @@ func UpdateCouponDetails(r *http.Request) string {
 	return "Successfully Updated"
 }
 
-// func ValidateCoupon(){
-// 	return "nothing"
-// }
+func ValidateCoupon(r *http.Request) bool {
+	coupon_details := GetCouponDetails(r)
+	if coupon_details["valid"] == "false" {
+		return false
+	}
+	availability_count, _ := strconv.Atoi(coupon_details["availability_count"])
+	if availability_count < 1 {
+		return false
+	}
+	// expiry_date, _ := time.Parse(time.RFC822, coupon_details["expiry_date"])
+	// if expiry_date < time.Now(){
+	// 	return false
+	// }
+	return true
+}
 
-// func ConsumeCoupon(){
-// 	return "nothing"
-// }
+func ConsumeCoupon(r *http.Request) string {
+	if ! ValidateCoupon(r) {
+		return "Coupon Invalid"
+	}
+
+	user:="root"
+	password:="pass@123"
+	database:="cms"
+	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
+	checkError(err)
+	defer con.Close()
+
+	r.PostFormValue("") 
+	if err := r.ParseForm(); err != nil {
+		// handle error
+	}
+	data := make(map[string]string)
+	for key, values := range r.PostForm {
+		data[key] = strings.Join(values," ")
+	}
+	log.Println("POST params were:", data)
+
+	coupon_details := GetCouponDetails(r)
+	availability_count, _ := strconv.Atoi(coupon_details["availability_count"])
+	// updated_availability_count := strconv.Itoa(availability_count-1)
+	coupon_id := coupon_details["id"]
+	log.Println("Updating the availability count of", coupon_details["code"], "to", availability_count-1)
+	rows1, err := con.Query("UPDATE `coupon` SET availability_count=? WHERE id=?", availability_count-1, coupon_id)
+	checkError(err)
+	log.Println(rows1)
+	rows2, err := con.Query("INSERT INTO `order` (coupon_id, client_id, status) VALUES (?, ?, ?)", coupon_id, rand.Intn(100), "Success")
+	checkError(err)
+	log.Println(rows2)
+
+	return "Successfully Consumed"
+}
