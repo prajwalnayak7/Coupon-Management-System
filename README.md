@@ -113,6 +113,15 @@ mysql -u root -p
 # Run the scripts /scripts/create_database.sql and /scripts/create_tables.sql
 ```
 
+Run the app in Docker
+```
+docker image build -t cms_app .
+docker container run -p 8888:5555 cms_app
+
+Try this command: 
+curl --location --request GET 'http://127.0.0.1:8888/ping'
+```
+
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
 > * The idea was to start small and simple, explore tools and techniques on the way and evolve consistently.

@@ -52,7 +52,7 @@ func main() {
 	router := http.NewServeMux()
 	router.Handle("/coupon/", coupon())
 	router.Handle("/coupon/consume/", consume())
-	router.Handle("/healthz", healthz())
+	router.Handle("/ping", ping())
 
 	nextRequestID := func() string {
 		return fmt.Sprintf("%d", time.Now().UnixNano())
@@ -144,13 +144,14 @@ func consume() http.Handler {
 	})
 }
 
-func healthz() http.Handler {
+func ping() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if atomic.LoadInt32(&healthy) == 1 {
-			w.WriteHeader(http.StatusNoContent)
+			fmt.Fprintln(w, "Pong :)")
 			return
 		}
 		w.WriteHeader(http.StatusServiceUnavailable)
+		fmt.Fprintln(w, "Server Down :(")
 	})
 }
 
