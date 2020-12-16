@@ -106,6 +106,12 @@ go mod vendor
 go fmt
 ```
 
+Set the environment variables
+```
+cp .env.sample .env
+// Edit/Add the environment variables as per the configs in the host machine
+```
+
 Setup database
 ```
 sudo docker run --name mysql-8 -p 127.0.0.1:5000:3306 -e MYSQL_ROOT_PASSWORD=pass@123 -d mysql:8.0.19
@@ -122,6 +128,11 @@ Try this command:
 curl --location --request GET 'http://127.0.0.1:8888/ping'
 ```
 
+
+Start all the Services in single command
+```
+docker compose up
+```
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
 > * The idea was to start small and simple, explore tools and techniques on the way and evolve consistently.

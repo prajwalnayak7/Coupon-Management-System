@@ -1,3 +1,5 @@
+################################ STAGE1: Build the go application
+
 FROM golang:alpine AS builder
 
 # Set necessary environmet variables needed for our image
@@ -23,8 +25,11 @@ RUN go build -o main .
 # Move to /dist directory as the place for resulting binary folder
 WORKDIR /dist
 
-# Copy binary from build to main folder
+# Copy binary (main file) from build to root folder
 RUN cp /build/main .
+
+
+################################ STAGE2: Run the generated binary application in a clean container. 
 
 # Build a small image
 FROM scratch

@@ -12,7 +12,8 @@ import (
 	"time"
 	"encoding/json"
 	"database/sql"
-    _ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 
 	data "github.com/prajwalnayak7/Coupon-Management-System/data"
 )
@@ -37,15 +38,20 @@ func connectToDatabase(user, password, database string){
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+	  log.Fatal("Error loading .env file")
+	}
+
 	flag.StringVar(&listenAddr, "listen-addr", ":5555", "server listen address")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "HTTP: ", log.LstdFlags)
 	logger.Println("🔥 Server is starting...")
 
-	user:="root"
-	password:="pass@123"
-	database:="cms"
+	user:=os.Getenv("MYSQL_USER")
+	password:=os.Getenv("MYSQL_PASSWORD")
+	database:=os.Getenv("MYSQL_DATABASE")
 	connectToDatabase(user, password, database)
 	logger.Println("Database", database,"connected successfully as user", user)
 

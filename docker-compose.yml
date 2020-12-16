@@ -1,0 +1,34 @@
+version: '2'
+services:
+  app:
+    # Build the app from a docker file
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Ports from container exposed to the docker machine and the guest machine
+    ports:
+      - 8888:5555
+    # File with environment declarations for the container
+    env_file:
+      - .env
+    # Link to containers in another service ie. Database
+    links:
+      - db
+    # Sync workspace folder with /go
+    volumes:
+     - ../../../../.:/go
+  db:
+    # Pull the pre-built image from docker hub
+    image: mysql:8.0.19
+    # Expose port 5000 externally and map it to default port of MySQL server
+    ports:
+      - "5000:3306"
+    # Restart policy
+    restart: always
+    # Environment variables
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes: []

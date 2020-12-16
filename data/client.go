@@ -3,6 +3,7 @@ package data
 import (
 	"database/sql"
 	"log"
+	"os"
 	"net/http"
 	"math/rand"
 	"time"
@@ -28,9 +29,9 @@ func randSeq(n int) string {
 }
 
 func GenerateCouponCode(r *http.Request) string {
-	user:="root"
-	password:="pass@123"
-	database:="cms"
+	user:=os.Getenv("MYSQL_USER")
+	password:=os.Getenv("MYSQL_PASSWORD")
+	database:=os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
@@ -61,9 +62,9 @@ func GenerateCouponCode(r *http.Request) string {
 }
 
 func GetCouponDetails(r *http.Request) map[string]string {
-	user:="root"
-	password:="pass@123"
-	database:="cms"
+	user:=os.Getenv("MYSQL_USER")
+	password:=os.Getenv("MYSQL_PASSWORD")
+	database:=os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
@@ -113,9 +114,9 @@ func ConsumeCoupon(r *http.Request) string {
 		return "Coupon Invalid"
 	}
 
-	user:="root"
-	password:="pass@123"
-	database:="cms"
+	user:=os.Getenv("MYSQL_USER")
+	password:=os.Getenv("MYSQL_PASSWORD")
+	database:=os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
