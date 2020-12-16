@@ -2,18 +2,18 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"flag"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync/atomic"
 	"time"
-	"encoding/json"
-	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 
 	data "github.com/prajwalnayak7/Coupon-Management-System/data"
 )
@@ -29,18 +29,18 @@ var (
 	healthy    int32
 )
 
-func connectToDatabase(user, password, database string){
+func connectToDatabase(user, password, database string) {
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	if err != nil {
-        log.Fatal(err)
-    }
+		log.Fatal(err)
+	}
 	defer con.Close()
 }
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-	  log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file")
 	}
 
 	flag.StringVar(&listenAddr, "listen-addr", ":5555", "server listen address")
@@ -49,11 +49,11 @@ func main() {
 	logger := log.New(os.Stdout, "HTTP: ", log.LstdFlags)
 	logger.Println("🔥 Server is starting...")
 
-	user:=os.Getenv("MYSQL_USER")
-	password:=os.Getenv("MYSQL_PASSWORD")
-	database:=os.Getenv("MYSQL_DATABASE")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	database := os.Getenv("MYSQL_DATABASE")
 	connectToDatabase(user, password, database)
-	logger.Println("Database", database,"connected successfully as user", user)
+	logger.Println("Database", database, "connected successfully as user", user)
 
 	router := http.NewServeMux()
 	router.Handle("/coupon/", coupon())
@@ -72,8 +72,6 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
-
-	
 
 	done := make(chan bool)
 	quit := make(chan os.Signal, 1)
@@ -113,18 +111,18 @@ func coupon() http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		switch r.Method {
-			case "GET":     
-				w.WriteHeader(http.StatusOK)
-				jsonData, _ := json.Marshal(data.GetCouponDetails(r))
-				fmt.Fprintln(w, string(jsonData))
-			case "POST":
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprintln(w, data.GenerateCouponCode(r))
-			case "PUT":
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprintln(w, data.UpdateCouponDetails(r))
-			default:
-				fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
+		case "GET":
+			w.WriteHeader(http.StatusOK)
+			jsonData, _ := json.Marshal(data.GetCouponDetails(r))
+			fmt.Fprintln(w, string(jsonData))
+		case "POST":
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, data.GenerateCouponCode(r))
+		case "PUT":
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, data.UpdateCouponDetails(r))
+		default:
+			fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
 		}
 	})
 }
@@ -138,14 +136,14 @@ func consume() http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		switch r.Method {
-			case "GET":     
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprintln(w, data.ValidateCoupon(r))
-			case "POST":
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprintln(w, data.ConsumeCoupon(r))
-			default:
-				fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
+		case "GET":
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, data.ValidateCoupon(r))
+		case "POST":
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, data.ConsumeCoupon(r))
+		default:
+			fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
 		}
 	})
 }

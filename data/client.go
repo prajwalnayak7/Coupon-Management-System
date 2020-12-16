@@ -3,46 +3,45 @@ package data
 import (
 	"database/sql"
 	"log"
-	"os"
-	"net/http"
 	"math/rand"
-	"time"
-	"strings"
+	"net/http"
+	"os"
 	"strconv"
+	"strings"
+	"time"
 )
-
 
 func checkError(err error) {
 	if err != nil {
-        log.Fatal(err)
-    }
+		log.Fatal(err)
+	}
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 func randSeq(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letters[rand.Intn(len(letters))]
-    }
-    return string(b)
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 func GenerateCouponCode(r *http.Request) string {
-	user:=os.Getenv("MYSQL_USER")
-	password:=os.Getenv("MYSQL_PASSWORD")
-	database:=os.Getenv("MYSQL_DATABASE")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	database := os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
 
-	r.PostFormValue("") 
+	r.PostFormValue("")
 	if err := r.ParseForm(); err != nil {
 		// handle error
 	}
 	data := make(map[string]string)
 	for key, values := range r.PostForm {
-		data[key] = strings.Join(values," ")
+		data[key] = strings.Join(values, " ")
 	}
 	log.Println("POST params were:", data)
 	rand.Seed(time.Now().UnixNano())
@@ -53,7 +52,7 @@ func GenerateCouponCode(r *http.Request) string {
 		i = 10
 	}
 	coupon_code := randSeq(i)
-	log.Println("Generated a Coupon Code:",coupon_code)
+	log.Println("Generated a Coupon Code:", coupon_code)
 
 	rows, err := con.Query("INSERT INTO `coupon` (code, expiry_date, availability_count, product_id, promo_type, discount_fixed, discount_variable) VALUES (?, ?, ?, ?, ?, ?, ?)", coupon_code, data["expiry_date"], data["availability_count"], data["product_id"], data["promo_type"], data["discount_fixed"], data["discount_variable"])
 	checkError(err)
@@ -62,9 +61,9 @@ func GenerateCouponCode(r *http.Request) string {
 }
 
 func GetCouponDetails(r *http.Request) map[string]string {
-	user:=os.Getenv("MYSQL_USER")
-	password:=os.Getenv("MYSQL_PASSWORD")
-	database:=os.Getenv("MYSQL_DATABASE")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	database := os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
@@ -73,7 +72,7 @@ func GetCouponDetails(r *http.Request) map[string]string {
 	code := r.URL.Query().Get("code")
 	rows, err := con.Query("SELECT * FROM `coupon` WHERE code=?", code)
 	cols, _ := rows.Columns()
-	
+
 	data := make(map[string]string)
 	if rows.Next() {
 		columns := make([]string, len(cols))
@@ -110,24 +109,24 @@ func ValidateCoupon(r *http.Request) bool {
 }
 
 func ConsumeCoupon(r *http.Request) string {
-	if ! ValidateCoupon(r) {
+	if !ValidateCoupon(r) {
 		return "Coupon Invalid"
 	}
 
-	user:=os.Getenv("MYSQL_USER")
-	password:=os.Getenv("MYSQL_PASSWORD")
-	database:=os.Getenv("MYSQL_DATABASE")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	database := os.Getenv("MYSQL_DATABASE")
 	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
 	checkError(err)
 	defer con.Close()
 
-	r.PostFormValue("") 
+	r.PostFormValue("")
 	if err := r.ParseForm(); err != nil {
 		// handle error
 	}
 	data := make(map[string]string)
 	for key, values := range r.PostForm {
-		data[key] = strings.Join(values," ")
+		data[key] = strings.Join(values, " ")
 	}
 	log.Println("POST params were:", data)
 

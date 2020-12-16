@@ -136,7 +136,8 @@ docker compose up
 Deploy all the Services in a Kubernetes cluster
 ```
 kompose convert
-kubectl apply -f <file_name>.yaml
+kubectl apply -f *.yaml
+rm -r *.yaml
 ```
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
