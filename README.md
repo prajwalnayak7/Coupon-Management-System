@@ -133,6 +133,11 @@ Start all the Services in single command
 ```
 docker compose up
 ```
+Deploy all the Services in a Kubernetes cluster
+```
+kompose convert
+kubectl apply -f <file_name>.yaml
+```
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
 > * The idea was to start small and simple, explore tools and techniques on the way and evolve consistently.
