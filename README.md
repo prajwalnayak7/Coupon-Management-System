@@ -39,6 +39,10 @@ The Schema / Model design :
 
 ![System Design](./res/SystemDesign.png)
 
+## Infrastructure Layer
+
+![Infrastructure Design](./res/InfraOverview.png)
+
 ### Interface Layer
 1. Generate a Coupon Code
    ```sh
@@ -135,9 +139,8 @@ docker compose up
 ```
 Deploy all the Services in a Kubernetes cluster
 ```
-kompose convert
-kubectl apply -f *.yaml
-rm -r *.yaml
+kompose convert -o kube-config.yaml
+kubectl apply -f kube-config.yaml
 ```
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
