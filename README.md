@@ -39,6 +39,10 @@ The Schema / Model design :
 
 ![System Design](./res/SystemDesign.png)
 
+## Infrastructure Layer
+
+![Infrastructure Design](./res/InfraOverview.png)
+
 ### Interface Layer
 1. Generate a Coupon Code
    ```sh
@@ -75,14 +79,16 @@ The Schema / Model design :
 
 
 ___
-### Demo
+### CI/CD
 TODO
 ### Testing
 TODO
-### CI/CD
+### Profiling
+TODO
+### Demo
 TODO
 ___
-## Engineering
+## Engineering Commands
 
 Module Management Commands:
 
@@ -91,14 +97,51 @@ Module Management Commands:
 go mod init github.com/prajwalnayak7/Coupon-Management-System
 ```
 ```
-// Automatically add project dependencies
-go build
+// Build the project and automatically add dependencies
+go build -o build
 // Clean unwanted dependencies
 go mod tidy
 // Download all vendor dependencies into a project folder
 go mod vendor
 ```
 
+```
+// Format the code
+go fmt
+```
+
+Set the environment variables
+```
+cp .env.sample .env
+// Edit/Add the environment variables as per the configs in the host machine
+```
+
+Setup database
+```
+sudo docker run --name mysql-8 -p 127.0.0.1:5000:3306 -e MYSQL_ROOT_PASSWORD=pass@123 -d mysql:8.0.19
+mysql -u root -p
+# Run the scripts /scripts/create_database.sql and /scripts/create_tables.sql
+```
+
+Run the app in Docker
+```
+docker image build -t cms_app .
+docker container run -p 8888:5555 cms_app
+
+Try this command: 
+curl --location --request GET 'http://127.0.0.1:8888/ping'
+```
+
+
+Start all the Services in single command
+```
+docker compose up
+```
+Deploy all the Services in a Kubernetes cluster
+```
+kompose convert -o kube-config.yaml
+kubectl apply -f kube-config.yaml
+```
 ### Note:
 > * Feel free to contribute / raise PRs / fork / experiement.
 > * The idea was to start small and simple, explore tools and techniques on the way and evolve consistently.

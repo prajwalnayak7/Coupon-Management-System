@@ -1,0 +1,6 @@
+# github.com/go-sql-driver/mysql v1.5.0
+## explicit
+github.com/go-sql-driver/mysql
+# github.com/joho/godotenv v1.3.0
+## explicit
+github.com/joho/godotenv
