@@ -29,15 +29,15 @@ An open source system which manages coupon codes, they can be utilised for:
 ___
 ## Design
 
+### Application Layer
+
+![System Design](./res/SystemDesign.png)
+
 ### Persistence Layer
 
 The Schema / Model design :
 ![Schema Design](./res/SchemaDesign.png)
 <!-- <iframe width="560" height="315" src='https://dbdiagram.io/embed/5fd2e1e79a6c525a03baa5fa'> </iframe> -->
-
-### Application Layer
-
-![System Design](./res/SystemDesign.png)
 
 ## Infrastructure Layer
 
