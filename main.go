@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
 	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -15,7 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	data "github.com/prajwalnayak7/Coupon-Management-System/data"
+	api "github.com/prajwalnayak7/Coupon-Management-System/api"
 )
 
 type key int
@@ -29,14 +27,6 @@ var (
 	healthy    int32
 )
 
-func connectToDatabase(user, password, database string) {
-	con, err := sql.Open("mysql", user+":"+password+"@tcp(localhost:5000)/"+database)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer con.Close()
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -45,21 +35,12 @@ func main() {
 
 	flag.StringVar(&listenAddr, "listen-addr", ":5555", "server listen address")
 	flag.Parse()
+	log.Println("🔥 Server is starting...")
+	api.ConnectToDB()
 
 	logger := log.New(os.Stdout, "HTTP: ", log.LstdFlags)
-	logger.Println("🔥 Server is starting...")
-
-	user := os.Getenv("MYSQL_USER")
-	password := os.Getenv("MYSQL_PASSWORD")
-	database := os.Getenv("MYSQL_DATABASE")
-	connectToDatabase(user, password, database)
-	logger.Println("Database", database, "connected successfully as user", user)
-
-	router := http.NewServeMux()
-	router.Handle("/coupon/", coupon())
-	router.Handle("/coupon/consume/", consume())
-	router.Handle("/ping", ping())
-
+	router := api.InitRouter()
+	//router.Handle("/ping", ping())
 	nextRequestID := func() string {
 		return fmt.Sprintf("%d", time.Now().UnixNano())
 	}
@@ -100,52 +81,6 @@ func main() {
 
 	<-done
 	logger.Println("Server stopped")
-}
-
-func coupon() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/coupon/" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		switch r.Method {
-		case "GET":
-			w.WriteHeader(http.StatusOK)
-			jsonData, _ := json.Marshal(data.GetCouponDetails(r))
-			fmt.Fprintln(w, string(jsonData))
-		case "POST":
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, data.GenerateCouponCode(r))
-		case "PUT":
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, data.UpdateCouponDetails(r))
-		default:
-			fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
-		}
-	})
-}
-
-func consume() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/coupon/consume/" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		switch r.Method {
-		case "GET":
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, data.ValidateCoupon(r))
-		case "POST":
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, data.ConsumeCoupon(r))
-		default:
-			fmt.Fprintln(w, "Sorry, only GET and POST methods are supported.")
-		}
-	})
 }
 
 func ping() http.Handler {
